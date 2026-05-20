@@ -79,9 +79,9 @@ def deduplicate(entries):
 def generate_feed(entries):
     """Generate RSS feed XML from a list of entries."""
     fg = FeedGenerator()
-    fg.id("https://your-username.github.io/rss-consolidator/feed.xml")
+    fg.id("https://hieronymusdw.github.io/rss-consolidator/feed.xml")
     fg.title("Geopolitics Digest")
-    fg.link(href="https://your-username.github.io/rss-consolidator/feed.xml", rel="self")
+    fg.link(href="https://hieronymusdw.github.io/rss-consolidator/feed.xml", rel="self")
     fg.description("Consolidated geopolitics RSS feed")
     fg.language("en")
     fg.lastBuildDate(datetime.now(timezone.utc))
