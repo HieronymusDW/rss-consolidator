@@ -39,4 +39,4 @@ jobs:
           git push
 
       - name: Trigger Make.com digest
-        run: curl -s -X POST "https://hook.eu1.make.com/7m5cevgjosoeao7t5j9nlv2aaqf7eryx"
+        run: curl -s -X POST "${{ secrets.MAKE_WEBHOOK_URL }}"
