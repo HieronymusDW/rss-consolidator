@@ -7,7 +7,7 @@ Fetches multiple RSS feeds, merges and deduplicates entries, outputs a single RS
 import feedparser
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from feedgen.feed import FeedGenerator
 from urllib.parse import urlparse
 
@@ -24,23 +24,21 @@ def fetch_entries(feed_url):
         parsed = feedparser.parse(feed_url)
         entries = []
         for entry in parsed.entries:
-            # Normalize the entry into a consistent dict
             link = entry.get("link", "")
             title = entry.get("title", "").strip()
 
             if not link or not title:
                 continue
 
-            # Parse published date, fall back to now if missing
+            # Parse published date, skip entry if missing
             published = None
             for date_field in ("published_parsed", "updated_parsed"):
                 if entry.get(date_field):
                     published = datetime(*entry[date_field][:6], tzinfo=timezone.utc)
                     break
             if published is None:
-                published = datetime.now(timezone.utc)
+                continue
 
-            # Get summary/description
             summary = ""
             if entry.get("summary"):
                 summary = entry.summary
@@ -68,7 +66,6 @@ def deduplicate(entries):
     seen = set()
     unique = []
     for entry in entries:
-        # Normalize URL: strip trailing slash and common tracking params
         url = entry["link"].split("?")[0].rstrip("/").lower()
         if url not in seen:
             seen.add(url)
@@ -114,10 +111,12 @@ def main():
     # Sort by date, newest first
     unique_entries.sort(key=lambda e: e["published"], reverse=True)
 
-    # Cap at 200 entries to keep feed manageable
-    unique_entries = unique_entries[:200]
+    # Filter to last 24 hours only
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
+    recent_entries = [e for e in unique_entries if e["published"] >= cutoff]
 
-    generate_feed(unique_entries)
+    print(f"Entries within last 24h: {len(recent_entries)}")
+    generate_feed(recent_entries)
 
 
 if __name__ == "__main__":
