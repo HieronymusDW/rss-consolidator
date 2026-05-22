@@ -30,12 +30,14 @@ jobs:
       - name: Run feed consolidator
         run: python merge_feeds.py
 
-      - name: Commit and push updated feed
+- name: Commit and push updated feed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main
           git add docs/feed.xml
+          git stash
+          git pull --rebase origin main
+          git stash pop
           git diff --staged --quiet || git commit -m "Update feed $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
 
