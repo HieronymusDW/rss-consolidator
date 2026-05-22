@@ -3,7 +3,6 @@
 RSS Feed Consolidator
 Fetches multiple RSS feeds, merges and deduplicates entries, outputs a single RSS feed.
 """
-
 import feedparser
 import json
 import os
@@ -11,12 +10,10 @@ from datetime import datetime, timezone, timedelta
 from feedgen.feed import FeedGenerator
 from urllib.parse import urlparse
 
-# Load feed URLs from config file
 with open("feeds.json") as f:
     FEEDS = json.load(f)
 
 OUTPUT_FILE = "docs/feed.xml"
-
 
 def fetch_entries(feed_url):
     """Fetch and parse a single RSS feed, return list of entries."""
@@ -26,11 +23,8 @@ def fetch_entries(feed_url):
         for entry in parsed.entries:
             link = entry.get("link", "")
             title = entry.get("title", "").strip()
-
             if not link or not title:
                 continue
-
-            # Parse published date, skip entry if missing
             published = None
             for date_field in ("published_parsed", "updated_parsed"):
                 if entry.get(date_field):
@@ -38,28 +32,26 @@ def fetch_entries(feed_url):
                     break
             if published is None:
                 continue
-
             summary = ""
             if entry.get("summary"):
                 summary = entry.summary
             elif entry.get("description"):
                 summary = entry.description
-
+            source = parsed.feed.get("title", urlparse(feed_url).netloc)
+            if source in ("Section Feed", ""):
+                source = urlparse(feed_url).netloc
             entries.append({
                 "title": title,
                 "link": link,
                 "published": published,
                 "summary": summary,
-                "source": parsed.feed.get("title", urlparse(feed_url).netloc),
+                "source": source,
             })
-
         print(f"  OK  {feed_url} — {len(entries)} entries")
         return entries
-
     except Exception as e:
         print(f"  FAIL {feed_url} — {e}")
         return []
-
 
 def deduplicate(entries):
     """Remove duplicate entries by normalized URL."""
@@ -72,7 +64,6 @@ def deduplicate(entries):
             unique.append(entry)
     return unique
 
-
 def generate_feed(entries):
     """Generate RSS feed XML from a list of entries."""
     fg = FeedGenerator()
@@ -82,7 +73,6 @@ def generate_feed(entries):
     fg.description("Consolidated geopolitics RSS feed")
     fg.language("en")
     fg.lastBuildDate(datetime.now(timezone.utc))
-
     for entry in entries:
         fe = fg.add_entry()
         fe.id(entry["link"])
@@ -90,34 +80,24 @@ def generate_feed(entries):
         fe.link(href=entry["link"])
         fe.published(entry["published"])
         fe.description(entry["summary"] or entry["title"])
-
     os.makedirs("docs", exist_ok=True)
     fg.rss_str(pretty=True)
     fg.rss_file(OUTPUT_FILE)
     print(f"\nWrote {len(entries)} entries to {OUTPUT_FILE}")
 
-
 def main():
     print(f"Fetching {len(FEEDS)} feeds...\n")
-
     all_entries = []
     for url in FEEDS:
         all_entries.extend(fetch_entries(url))
-
     print(f"\nTotal entries before dedup: {len(all_entries)}")
     unique_entries = deduplicate(all_entries)
     print(f"Total entries after dedup:  {len(unique_entries)}")
-
-    # Sort by date, newest first
     unique_entries.sort(key=lambda e: e["published"], reverse=True)
-
-    # Filter to last 24 hours only
     cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
     recent_entries = [e for e in unique_entries if e["published"] >= cutoff]
-
     print(f"Entries within last 24h: {len(recent_entries)}")
     generate_feed(recent_entries)
-
 
 if __name__ == "__main__":
     main()
