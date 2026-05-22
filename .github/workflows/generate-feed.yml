@@ -30,7 +30,7 @@ jobs:
       - name: Run feed consolidator
         run: python merge_feeds.py
 
-- name: Commit and push updated feed
+      - name: Commit and push updated feed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
