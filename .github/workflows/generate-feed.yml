@@ -37,3 +37,6 @@ jobs:
           git add docs/feed.xml
           git diff --staged --quiet || git commit -m "Update feed $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
+
+      - name: Trigger Make.com digest
+        run: curl -s -X POST "https://hook.eu1.make.com/7m5cevgjosoeao7t5j9nlv2aaqf7eryx"
