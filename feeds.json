@@ -1,14 +1,12 @@
 [
-"https://feeds.bbci.co.uk/news/world/rss.xml",
-"https://www.theguardian.com/world/rss",
-"https://www.aljazeera.com/xml/rss/all.xml",
-"https://www.politico.eu/feed",
-"https://www.politico.com/rss/politicopicks.xml",
-"https://kyivindependent.com/feed/news/",
-"https://www.pbs.org/newshour/feeds/rss/world",
-"https://www.pbs.org/newshour/feeds/rss/politics",
-"https://www.middleeasteye.net/rss",
-"https://news.google.com/rss/search?q=when:24h+allinurl:reuters.com&hl=en-US&gl=US&ceid=US:en",
-"https://news.google.com/rss/search?q=when:24h allinurl:apnews.com",
-"https://news.google.com/rss/search?q=when:24h allinurl:bloomberg.com"
+  "https://feeds.bbci.co.uk/news/world/rss.xml",
+  "https://www.theguardian.com/world/rss",
+  "https://www.aljazeera.com/xml/rss/all.xml",
+  "https://www.politico.eu/feed",
+  "https://www.politico.com/rss/politicopicks.xml",
+  "https://kyivindependent.com/feed/news/",
+  "https://www.pbs.org/newshour/feeds/rss/world",
+  "https://www.pbs.org/newshour/feeds/rss/politics",
+  "https://www.middleeasteye.net/rss",
+  "https://apnews.com/rss"
 ]
